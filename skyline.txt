@@ -1,0 +1,81 @@
+class Solution {
+    public List<List<Integer>> getSkyline(int[][] buildings) {
+       int len=buildings.length;
+        List<List<Integer>> res=new ArrayList<>();
+        if(len==0) return res;
+        if(len==1)
+        {
+            int x=buildings[0][0];
+            int end=buildings[0][1];
+            int h=buildings[0][2];
+            res.add(new ArrayList<>(){{add(x);add(h);}});
+            res.add(new ArrayList<>(){{add(end);add(0);}});
+            return res;
+        }
+        List<List<Integer>> left,right;
+        left=getSkyline(Arrays.copyOfRange(buildings,0,len/2));
+        right=getSkyline(Arrays.copyOfRange(buildings,len/2,len));
+        
+        return merge(left,right);
+    }
+    
+    public List<List<Integer>> merge(List<List<Integer>> left,List<List<Integer>> right)
+    {
+        int l_len=left.size(),r_len=right.size(),l=0,r=0,left_y=0,right_y=0,prev=0;             
+        int x,max_y;
+        List<List<Integer>> ans=new ArrayList<>();
+        while(l<l_len && r<r_len)
+        {
+            List<Integer> Lpoint=left.get(l);
+            List<Integer> Rpoint=right.get(r);
+            if(Lpoint.get(0)<Rpoint.get(0))
+            {
+                x=Lpoint.get(0);
+                left_y=Lpoint.get(1);
+                l++;
+            }
+            else
+            {
+                x=Rpoint.get(0);
+                right_y=Rpoint.get(1);
+                r++;
+            }
+            max_y=Math.max(left_y,right_y);
+            if(prev!=max_y)
+            {
+                output(ans,x,max_y);
+                prev=max_y;
+            }
+        }
+            
+        append(ans,left,l,l_len,prev);
+            
+        append(ans,right,r,r_len,prev);
+        
+        return ans;
+        
+    }
+    public void output(List<List<Integer>> ans,int x,int y)
+    {
+        if(ans.isEmpty() || ans.get(ans.size()-1).get(0)!=x)
+            ans.add(new ArrayList<>(){{add(x);add(y);}});
+        else
+            ans.get(ans.size()-1).set(1,y);
+    }
+    public void append(List<List<Integer>> ans,List<List<Integer>> curr,int idx,int len,int prev)
+    {
+        while(idx<len)
+        {
+            List<Integer> point=curr.get(idx);
+            int x=point.get(0);
+            int y=point.get(1);
+            idx++;
+            if(prev!=y)
+            {
+                output(ans,x,y);
+                prev=y;
+            }
+        }
+    }
+    
+}
